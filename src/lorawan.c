@@ -586,11 +586,23 @@ static void OnJoinRequest( LmHandlerJoinParams_t* params )
     }
 }
 
+void (*tx_callback)(LmHandlerTxParams_t* params) = NULL;
+void (*rx_callback)(LmHandlerRxParams_t* params) = NULL;
+
 static void OnTxData( LmHandlerTxParams_t* params )
 {
     if (Debug) {
         DisplayTxUpdate( params );
     }
+
+    if (tx_callback != NULL) {
+        tx_callback( params );
+    }
+}
+
+void lorawan_set_tx_callback( void (*callback)(LmHandlerTxParams_t*) )
+{
+    tx_callback = callback;
 }
 
 static void OnRxData( LmHandlerAppData_t* appData, LmHandlerRxParams_t* params )
@@ -602,6 +614,15 @@ static void OnRxData( LmHandlerAppData_t* appData, LmHandlerRxParams_t* params )
     memcpy(AppRxData.Buffer, appData->Buffer, appData->BufferSize);
     AppRxData.BufferSize = appData->BufferSize;
     AppRxData.Port = appData->Port;
+
+    if (rx_callback != NULL) {
+        rx_callback( params );
+    }
+}
+
+void lorawan_set_rx_callback( void (*callback)(LmHandlerRxParams_t*) )
+{
+    rx_callback = callback;
 }
 
 static void OnClassChange( DeviceClass_t deviceClass )

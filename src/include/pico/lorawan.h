@@ -16,6 +16,7 @@ extern "C" {
 #include "hardware/spi.h"
 
 #include "LoRaMac.h"
+#include "LmHandler.h"
 
 struct lorawan_sx1276_settings {
     struct {
@@ -61,6 +62,10 @@ int lorawan_process();
 int lorawan_process_timeout_ms(uint32_t timeout_ms);
 
 int lorawan_send_unconfirmed(const void* data, uint8_t data_len, uint8_t app_port);
+
+void lorawan_set_tx_callback(void (*callback)(LmHandlerTxParams_t* params));
+
+void lorawan_set_rx_callback(void (*callback)(LmHandlerRxParams_t* params));
 
 int lorawan_receive(void* data, uint8_t data_len, uint8_t* app_port);
 
